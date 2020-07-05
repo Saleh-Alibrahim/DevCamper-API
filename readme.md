@@ -42,4 +42,9 @@ Extensive documentation with examples [here](https://documenter.getpostman.com/v
 
 - Version: 1.0.0
 - License: MIT
-- Author: Brad Traversy
+
+## Authors
+
+This project was part of Udemey course : Nodejs api Masterclass
+
+By : brad traversy
