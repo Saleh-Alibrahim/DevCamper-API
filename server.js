@@ -3,6 +3,7 @@ const express = require('express');
 const dotenv = require('dotenv');
 const morgan = require('morgan');
 const colors = require('colors');
+const fileUpload = require('express-fileupload')
 const errorHandler = require('./middleware/error');
 const connectDB = require('./config/db');
 
@@ -31,7 +32,11 @@ if (process.env.NODE_ENV === 'development') {
 // Set static folder
 app.use(express.static(path.join(__dirname, 'public')));
 
-const PORT = process.env.PORT || 5000;
+
+// File Upload
+app.use(fileUpload());
+
+
 
 // Mount routers
 app.use('/api/v1/bootcamps', bootcamps);
@@ -41,9 +46,7 @@ app.use('/api/v1/courses', courses);
 app.use(errorHandler);
 
 
-const server = app.listen(
-    PORT,
-    console.log(
-        `Server running in ${process.env.NODE_ENV} mode on port ${PORT}`.yellow.bold
-    )
-);
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT,
+    console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`.yellow.bold));
