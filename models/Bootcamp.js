@@ -2,6 +2,9 @@ const mongoose = require('mongoose');
 const slugify = require('slugify');
 const geocoder = require('../utils/geocoder');
 
+const protect = require('../middleware/auth');
+
+
 
 const BootcampSchema = new mongoose.Schema(
   {
