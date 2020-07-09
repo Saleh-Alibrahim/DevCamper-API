@@ -9,7 +9,7 @@ dotenv.config({ path: './config/config.env' });
 // Load models
 const Bootcamp = require('./models/Bootcamp');
 const Course = require('./models/Course');
-
+const User = require('./models/User');
 // Connect to DB
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
@@ -46,6 +46,7 @@ const deleteData = async () => {
   try {
     await Bootcamp.deleteMany();
     await Course.deleteMany();
+    await User.deleteMany();
     console.log('Data Destroyed...'.red.inverse);
     process.exit();
   } catch (err) {
