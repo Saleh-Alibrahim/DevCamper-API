@@ -11,6 +11,11 @@ const connectDB = require('./config/db');
 // Load env vars
 dotenv.config({ path: './config/config.env' });
 
+// Change the environment to prodction
+if (process.argv[2] === '-p') {
+    process.env.NODE_ENV = 'prodction';
+}
+
 // Connect to database
 connectDB();
 

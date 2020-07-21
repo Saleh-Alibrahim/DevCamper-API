@@ -48,6 +48,7 @@ exports.getCourse = asyncHandler(async (req, res, next) => {
 // @access    Private
 exports.addCourse = asyncHandler(async (req, res, next) => {
   req.body.bootcamp = req.params.bootcampId;
+  req.body.user = req.user.id;
 
   const bootcamp = await Bootcamp.findById(req.params.bootcampId);
 
@@ -55,6 +56,12 @@ exports.addCourse = asyncHandler(async (req, res, next) => {
     return next(
       new ErrorResponse(`No bootcamp with the id of ${req.params.bootcampId}`),
       404
+    );
+  }
+  // Make sure user is bootcamp owner
+  if (bootcamp.user.toString() !== req.user.id && req.user.role !== 'admin') {
+    return next(
+      new ErrorResponse(`Can't add course : The user with ID ${req.user.id} is not the owner of this bootcamp`, 401)
     );
   }
   const course = await Course.create(req.body);
@@ -75,6 +82,12 @@ exports.updateCourse = asyncHandler(async (req, res, next) => {
     return next(
       new ErrorResponse(`No course with the id of ${req.params.id}`),
       404
+    );
+  }
+  // Make sure user is course owner
+  if (course.user.toString() !== req.user.id && req.user.role !== 'admin') {
+    return next(
+      new ErrorResponse(`Can't update course : The user with ID ${req.user.id} is not the owner of this course`, 401)
     );
   }
 
@@ -100,6 +113,13 @@ exports.deleteCourse = asyncHandler(async (req, res, next) => {
     return next(
       new ErrorResponse(`No course with the id of ${req.params.id}`),
       404
+    );
+
+  }
+  // Make sure user is course owner
+  if (course.user.toString() !== req.user.id && req.user.role !== 'admin') {
+    return next(
+      new ErrorResponse(`Can't delete course : The user with ID ${req.user.id} is not the owner of this course`, 401)
     );
   }
 

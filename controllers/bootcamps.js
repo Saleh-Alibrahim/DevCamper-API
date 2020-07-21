@@ -30,6 +30,17 @@ exports.getBootcamp = asyncHandler(async (req, res, next) => {
 // @route     POST /api/v1/bootcamps
 // @access    Private
 exports.createBootcamp = asyncHandler(async (req, res, next) => {
+
+  req.body.user = req.user;
+
+  console.log(req.body.user);
+  const publishedBootcamp = await Bootcamp.findOne({ user: req.user.id });
+
+  if (publishedBootcamp && req.user.role !== 'admin') {
+    return next(
+      new ErrorResponse(`The user with ID ${req.user.id} has already publish a bootcamp`, 400)
+    );
+  }
   const bootcamp = await Bootcamp.create(req.body);
   res.status(201).json({
     success: true,
@@ -49,6 +60,14 @@ exports.updateBootcamp = asyncHandler(async (req, res, next) => {
     );
   }
 
+  // Make sure user is bootcamp owner
+  if (bootcamp.user.toString() !== req.user.id && req.user.role !== 'admin') {
+    return next(
+      new ErrorResponse(`Can't Update : The user with ID ${req.user.id} is not the owner of this bootcamp`, 401)
+    );
+  }
+
+
   bootcamp = await Bootcamp.findOneAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true
@@ -66,6 +85,12 @@ exports.deleteBootcamp = asyncHandler(async (req, res, next) => {
   if (!bootcamp) {
     return next(
       new ErrorResponse(`Bootcamp not found with id of ${req.params.id}`, 404)
+    );
+  }
+  // Make sure user is bootcamp owner
+  if (bootcamp.user.toString() !== req.user.id && req.user.role !== 'admin') {
+    return next(
+      new ErrorResponse(`Can't Delete : The user with ID ${req.user.id} is not the owner of this bootcamp`, 401)
     );
   }
 
@@ -113,14 +138,19 @@ exports.bootcampPhotoUpload = asyncHandler(async (req, res, next) => {
       new ErrorResponse(`Bootcamp not found with id of ${req.params.id}`, 404)
     );
   }
+  // Make sure user is bootcamp owner
+  if (bootcamp.user.toString() !== req.user.id && req.user.role !== 'admin') {
+    return next(
+      new ErrorResponse(`Can't Upload photo : The user with ID ${req.user.id} is not the owner of this bootcamp`, 401)
+    );
+  }
+
   if (!req.files) {
     return next(
       new ErrorResponse(`Please upload a file`, 400)
     );
   }
   const file = req.files.file;
-
-  console.log('file :>> ', file);
 
   // Check if the file is image
   if (!file.mimetype.startsWith('image')) {
