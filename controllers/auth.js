@@ -50,6 +50,52 @@ exports.loginUsers = asyncHandler(async (req, res, next) => {
 
 });
 
+
+// @desc      Get the logined user
+// @route     GET /api/v1/auth/me
+// @access    Private
+exports.getMe = asyncHandler(async (req, res, next) => {
+
+  res.status(200).json(
+    {
+      success: true,
+      user: req.user
+    }
+  );
+
+
+});
+
+
+// @desc      Forgot password
+// @route     GET /api/v1/auth/forgotpassword
+// @access    Public
+exports.forgotPassword = asyncHandler(async (req, res, next) => {
+
+  const user = await User.findOne({ email: req.body.email });
+
+  if (!user) {
+    return next(new ErrorResponse(`There is no user with this email ${req.body.email}`, 400));
+  }
+
+  // Get reset token
+  const token = user.getResetPasswordToken();
+
+  console.log('token :>> ', token);
+
+  await user.save({ validateBeforeSave: false });
+
+  res.status(200).json(
+    {
+      success: true,
+      user: req.user
+    }
+  );
+
+
+});
+
+
 const sendTokenResponse = (user, statusCode, res) => {
 
   // Create token
@@ -74,21 +120,6 @@ const sendTokenResponse = (user, statusCode, res) => {
       }
     );
 };
-
-// @desc      Get the logined user
-// @route     GET /api/v1/auth/me
-// @access    Private
-exports.getMe = asyncHandler(async (req, res, next) => {
-
-  res.status(200).json(
-    {
-      success: true,
-      user: req.user
-    }
-  );
-
-
-});
 
 
 
