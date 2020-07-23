@@ -18,7 +18,7 @@ exports.protect = asycHandler(async (req, res, next) => {
         token = req.headers.authorization.split(' ')[1];
     }
     else if (req.cookies.token) {
-        toekn = req.cookies.token;
+        token = req.cookies.token;
     }
 
     // Make sure token exists
