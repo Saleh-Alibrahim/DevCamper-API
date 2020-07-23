@@ -21,7 +21,7 @@ const router = express.Router();
 router.post('/register', registerUsers);
 router.post('/login', loginUsers);
 router.get('/me', protect, getMe);
-router.get('/logout', prrouter.put('/logout', protect, logout); otect, logout);
+router.get('/logout', protect, logout);
 router.put('/updatedetails', protect, updateDetails);
 router.put('/updatepassword', protect, updatePassword);
 router.post('/forgotpassword', forgotPassword);

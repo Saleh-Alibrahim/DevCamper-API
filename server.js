@@ -7,6 +7,10 @@ const fileUpload = require('express-fileupload');
 const cookieParser = require('cookie-parser');
 const mongoSanitize = require('express-mongo-sanitize');
 const helmet = require('helmet');
+const xss = require('xss-clean');
+const rateLimit = require('express-rate-limit');
+const hpp = require('hpp');
+const cors = require('cors');
 const errorHandler = require('./middleware/error');
 const connectDB = require('./config/db');
 
@@ -21,7 +25,7 @@ if (process.argv[2] === '-p') {
 // Connect to database
 connectDB();
 
-// Route files
+// Route files 
 const bootcamps = require('./routes/bootcamps');
 const courses = require('./routes/courses');
 const auth = require('./routes/auth');
@@ -35,6 +39,25 @@ app.use(express.json());
 
 // Cookie parser
 app.use(cookieParser());
+
+// Prevent XSS attack
+app.use(xss());
+
+// Rate Limiting
+
+const Limiter = rateLimit({
+    windowMs: 10 * 60 * 1000, // 10 mins
+    max: 100
+});
+
+app.use(Limiter);
+
+// Prevent http param pollution
+app.use(hpp());
+
+
+// Enable CORS
+app.use(cors());
 
 
 // Dev logging middleware
@@ -50,10 +73,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(fileUpload());
 
 // Sanitize data 
-app.use(mongoSanitize);
+app.use(mongoSanitize());
 
 // Set security headers
-app.use(mongoSanitize);
+app.use(helmet());
 
 
 
@@ -70,5 +93,11 @@ app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT,
-    console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`.yellow.bold));
+app.listen(PORT, console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`.yellow.bold));
+
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (err, promise) => {
+    console.log(`Error: ${err.message}`.red);
+    // Close server & exit process
+    // server.close(() => process.exit(1));
+});
