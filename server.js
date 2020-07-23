@@ -44,7 +44,6 @@ app.use(cookieParser());
 app.use(xss());
 
 // Rate Limiting
-
 const Limiter = rateLimit({
     windowMs: 10 * 60 * 1000, // 10 mins
     max: 100
@@ -88,12 +87,18 @@ app.use('/api/v1/users', users);
 app.use('/api/v1/reviews', reviews);
 
 
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/index.html');
+});
+
+
 app.use(errorHandler);
 
 
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`.yellow.bold));
+
 
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err, promise) => {
